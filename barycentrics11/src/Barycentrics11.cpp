@@ -190,13 +190,14 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     }
     else
     {
+        // Check for a driver that supports this
         int major = 0;
         int minor = 0;
         int patch = 0;
         sscanf_s( g_AGSGPUInfo.radeonSoftwareVersion, "%d.%d.%d", &major, &minor, &patch );
-        if ( major < 16 || ( major == 16 && minor < 5 ) || ( major == 16 && minor == 5 && patch < 2 ) )
+        if ( major < 16 || ( major == 16 && minor < 9 ) || ( major == 16 && minor == 9 && patch < 1 ) )
         {
-            MessageBox( 0, L"You will need to update your driver to 16.5.2 or later in order to run these shader extensions", L"Information", MB_OK );
+            MessageBox( 0, L"You will need to update your driver to 16.9.1 or later in order to run these shader extensions", L"Information", MB_OK );
         }
     }
 
@@ -219,7 +220,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
     InitApp();
     DXUTInit( true, true ); // Parse the command line, show msgboxes on error, no extra command line params
     DXUTSetCursorSettings( true, true ); // Show the cursor and clip it when in full screen
-    DXUTCreateWindow( L"Barycentrics11 v1.0" );
+    DXUTCreateWindow( L"Barycentrics11 v1.1" );
 
     int width = 1920;
     int height = 1080;
