@@ -22,15 +22,12 @@
 
 /**
 *************************************************************************************************************
-* @file  ags_shader_intrinsics_dx11.hlsl
+* @File  ags_shader_intrinsics_dx11.hlsl
 *
 * @brief
 *    AMD D3D Shader Intrinsics API hlsl file.
 *    This include file contains the shader intrinsics definitions (structures, enums, constant)
 *    and HLSL shader intrinsics functions.
-*
-* @note
-*    This does not work with immediate values or values that the compiler determines can produces denorms
 *
 *************************************************************************************************************
 */
@@ -43,14 +40,16 @@
 *   Definitions to construct the intrinsic instruction composed of an opcode and optional immediate data.
 *************************************************************************************************************
 */
-#define AmdDxExtShaderIntrinsics_MagicCodeShift  28
-#define AmdDxExtShaderIntrinsics_MagicCodeMask   0xf
-#define AmdDxExtShaderIntrinsics_DataShift       8
-#define AmdDxExtShaderIntrinsics_DataMask        0xfffff
-#define AmdDxExtShaderIntrinsics_OpcodeShift     0
-#define AmdDxExtShaderIntrinsics_OpcodeMask      0xff
+#define AmdDxExtShaderIntrinsics_MagicCodeShift   28
+#define AmdDxExtShaderIntrinsics_MagicCodeMask    0xf
+#define AmdDxExtShaderIntrinsics_OpcodePhaseShift 24
+#define AmdDxExtShaderIntrinsics_OpcodePhaseMask  0x3
+#define AmdDxExtShaderIntrinsics_DataShift        8
+#define AmdDxExtShaderIntrinsics_DataMask         0xffff
+#define AmdDxExtShaderIntrinsics_OpcodeShift      0
+#define AmdDxExtShaderIntrinsics_OpcodeMask       0xff
 
-#define AmdDxExtShaderIntrinsics_MagicCode           0x5
+#define AmdDxExtShaderIntrinsics_MagicCode        0x5
 
 
 /**
@@ -73,6 +72,16 @@
 #define AmdDxExtShaderIntrinsicsOpcode_BaryCoord      0x0e
 #define AmdDxExtShaderIntrinsicsOpcode_VtxParam       0x0f
 
+
+/**
+*************************************************************************************************************
+*   Intrinsic opcode phases.
+*************************************************************************************************************
+*/
+#define AmdDxExtShaderIntrinsicsOpcodePhase_0    0x0
+#define AmdDxExtShaderIntrinsicsOpcodePhase_1    0x1
+#define AmdDxExtShaderIntrinsicsOpcodePhase_2    0x2
+#define AmdDxExtShaderIntrinsicsOpcodePhase_3    0x3
 
 /**
 *************************************************************************************************************
@@ -117,61 +126,65 @@
 *   the inputs to the AmdDxExtShaderIntrinsicsOpcode_VertexParameter function
 *************************************************************************************************************
 */
-#define AmdDxExtShaderIntrinsicsBarycentric_Vertex0  0x0
-#define AmdDxExtShaderIntrinsicsBarycentric_Vertex1  0x1
-#define AmdDxExtShaderIntrinsicsBarycentric_Vertex2  0x2
+#define AmdDxExtShaderIntrinsicsBarycentric_Vertex0     0x0
+#define AmdDxExtShaderIntrinsicsBarycentric_Vertex1     0x1
+#define AmdDxExtShaderIntrinsicsBarycentric_Vertex2     0x2
 
-#define AmdDxExtShaderIntrinsicsBarycentric_Param0   0x00
-#define AmdDxExtShaderIntrinsicsBarycentric_Param1   0x01
-#define AmdDxExtShaderIntrinsicsBarycentric_Param2   0x02
-#define AmdDxExtShaderIntrinsicsBarycentric_Param3   0x03
-#define AmdDxExtShaderIntrinsicsBarycentric_Param4   0x04
-#define AmdDxExtShaderIntrinsicsBarycentric_Param5   0x05
-#define AmdDxExtShaderIntrinsicsBarycentric_Param6   0x06
-#define AmdDxExtShaderIntrinsicsBarycentric_Param7   0x07
-#define AmdDxExtShaderIntrinsicsBarycentric_Param8   0x08
-#define AmdDxExtShaderIntrinsicsBarycentric_Param9   0x09
-#define AmdDxExtShaderIntrinsicsBarycentric_Param10  0x0a
-#define AmdDxExtShaderIntrinsicsBarycentric_Param11  0x0b
-#define AmdDxExtShaderIntrinsicsBarycentric_Param12  0x0c
-#define AmdDxExtShaderIntrinsicsBarycentric_Param13  0x0d
-#define AmdDxExtShaderIntrinsicsBarycentric_Param14  0x0e
-#define AmdDxExtShaderIntrinsicsBarycentric_Param15  0x0f
-#define AmdDxExtShaderIntrinsicsBarycentric_Param16  0x10
-#define AmdDxExtShaderIntrinsicsBarycentric_Param17  0x11
-#define AmdDxExtShaderIntrinsicsBarycentric_Param18  0x12
-#define AmdDxExtShaderIntrinsicsBarycentric_Param19  0x13
-#define AmdDxExtShaderIntrinsicsBarycentric_Param20  0x14
-#define AmdDxExtShaderIntrinsicsBarycentric_Param21  0x15
-#define AmdDxExtShaderIntrinsicsBarycentric_Param22  0x16
-#define AmdDxExtShaderIntrinsicsBarycentric_Param23  0x17
-#define AmdDxExtShaderIntrinsicsBarycentric_Param24  0x18
-#define AmdDxExtShaderIntrinsicsBarycentric_Param25  0x19
-#define AmdDxExtShaderIntrinsicsBarycentric_Param26  0x1a
-#define AmdDxExtShaderIntrinsicsBarycentric_Param27  0x1b
-#define AmdDxExtShaderIntrinsicsBarycentric_Param28  0x1c
-#define AmdDxExtShaderIntrinsicsBarycentric_Param29  0x1d
-#define AmdDxExtShaderIntrinsicsBarycentric_Param30  0x1e
-#define AmdDxExtShaderIntrinsicsBarycentric_Param31  0x1f
+#define AmdDxExtShaderIntrinsicsBarycentric_Param0      0x00
+#define AmdDxExtShaderIntrinsicsBarycentric_Param1      0x01
+#define AmdDxExtShaderIntrinsicsBarycentric_Param2      0x02
+#define AmdDxExtShaderIntrinsicsBarycentric_Param3      0x03
+#define AmdDxExtShaderIntrinsicsBarycentric_Param4      0x04
+#define AmdDxExtShaderIntrinsicsBarycentric_Param5      0x05
+#define AmdDxExtShaderIntrinsicsBarycentric_Param6      0x06
+#define AmdDxExtShaderIntrinsicsBarycentric_Param7      0x07
+#define AmdDxExtShaderIntrinsicsBarycentric_Param8      0x08
+#define AmdDxExtShaderIntrinsicsBarycentric_Param9      0x09
+#define AmdDxExtShaderIntrinsicsBarycentric_Param10     0x0a
+#define AmdDxExtShaderIntrinsicsBarycentric_Param11     0x0b
+#define AmdDxExtShaderIntrinsicsBarycentric_Param12     0x0c
+#define AmdDxExtShaderIntrinsicsBarycentric_Param13     0x0d
+#define AmdDxExtShaderIntrinsicsBarycentric_Param14     0x0e
+#define AmdDxExtShaderIntrinsicsBarycentric_Param15     0x0f
+#define AmdDxExtShaderIntrinsicsBarycentric_Param16     0x10
+#define AmdDxExtShaderIntrinsicsBarycentric_Param17     0x11
+#define AmdDxExtShaderIntrinsicsBarycentric_Param18     0x12
+#define AmdDxExtShaderIntrinsicsBarycentric_Param19     0x13
+#define AmdDxExtShaderIntrinsicsBarycentric_Param20     0x14
+#define AmdDxExtShaderIntrinsicsBarycentric_Param21     0x15
+#define AmdDxExtShaderIntrinsicsBarycentric_Param22     0x16
+#define AmdDxExtShaderIntrinsicsBarycentric_Param23     0x17
+#define AmdDxExtShaderIntrinsicsBarycentric_Param24     0x18
+#define AmdDxExtShaderIntrinsicsBarycentric_Param25     0x19
+#define AmdDxExtShaderIntrinsicsBarycentric_Param26     0x1a
+#define AmdDxExtShaderIntrinsicsBarycentric_Param27     0x1b
+#define AmdDxExtShaderIntrinsicsBarycentric_Param28     0x1c
+#define AmdDxExtShaderIntrinsicsBarycentric_Param29     0x1d
+#define AmdDxExtShaderIntrinsicsBarycentric_Param30     0x1e
+#define AmdDxExtShaderIntrinsicsBarycentric_Param31     0x1f
 
-#define AmdDxExtShaderIntrinsicsBarycentric_ParamShift 0
-#define AmdDxExtShaderIntrinsicsBarycentric_ParamMask  0x1f
-#define AmdDxExtShaderIntrinsicsBarycentric_VtxShift   0x5
-#define AmdDxExtShaderIntrinsicsBarycentric_VtxMask    0x3
+#define AmdDxExtShaderIntrinsicsBarycentric_ComponentX  0x0
+#define AmdDxExtShaderIntrinsicsBarycentric_ComponentY  0x1
+#define AmdDxExtShaderIntrinsicsBarycentric_ComponentZ  0x2
+#define AmdDxExtShaderIntrinsicsBarycentric_ComponentW  0x3
 
+#define AmdDxExtShaderIntrinsicsBarycentric_ParamShift     0
+#define AmdDxExtShaderIntrinsicsBarycentric_ParamMask      0x1f
+#define AmdDxExtShaderIntrinsicsBarycentric_VtxShift       0x5
+#define AmdDxExtShaderIntrinsicsBarycentric_VtxMask        0x3
+#define AmdDxExtShaderIntrinsicsBarycentric_ComponentShift 0x7
+#define AmdDxExtShaderIntrinsicsBarycentric_ComponentMask  0x3
 
 /**
 *************************************************************************************************************
-*   Resource and sampler slots
+*   Resource slots
 *************************************************************************************************************
 */
-#define AmdDxExtShaderIntrinsicsResSlot       t127
-#define AmdDxExtShaderIntrinsicsSamplerSlot   s15
+#ifndef AmdDxExtShaderIntrinsicsUAVSlot
+#define AmdDxExtShaderIntrinsicsUAVSlot       u7
+#endif
 
-SamplerState AmdDxExtShaderIntrinsicsSamplerState : register (AmdDxExtShaderIntrinsicsSamplerSlot);
-
-Texture3D<float4> AmdDxExtShaderIntrinsicsResource : register (AmdDxExtShaderIntrinsicsResSlot);
-
+RWByteAddressBuffer AmdDxExtShaderIntrinsicsUAV : register(AmdDxExtShaderIntrinsicsUAVSlot);
 
 /**
 *************************************************************************************************************
@@ -182,46 +195,94 @@ Texture3D<float4> AmdDxExtShaderIntrinsicsResource : register (AmdDxExtShaderInt
 *
 *************************************************************************************************************
 */
-uint MakeAmdShaderIntrinsicsInstruction(uint opcode, uint immediateData)
+uint MakeAmdShaderIntrinsicsInstruction(uint opcode, uint opcodePhase, uint immediateData)
 {
     return ((AmdDxExtShaderIntrinsics_MagicCode << AmdDxExtShaderIntrinsics_MagicCodeShift) |
             (immediateData << AmdDxExtShaderIntrinsics_DataShift) |
+            (opcodePhase << AmdDxExtShaderIntrinsics_OpcodePhaseShift) |
             (opcode << AmdDxExtShaderIntrinsics_OpcodeShift));
 }
 
 
 /**
 *************************************************************************************************************
-*   AmdDxExtShaderIntrinsics_Readfirstlane
+*   AmdDxExtShaderIntrinsics_ReadfirstlaneF
 *
-*   Returns the value of src for the first active lane of the wavefront.
+*   Returns the value of float src for the first active lane of the wavefront.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Readfirstlane) returned S_OK.
 *
 *************************************************************************************************************
 */
-float AmdDxExtShaderIntrinsics_Readfirstlane(float src)
+float AmdDxExtShaderIntrinsics_ReadfirstlaneF(float src)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Readfirstlane, 0);
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Readfirstlane,
+                                                          0, 0);
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(src, 0, 0),
-                                                        asfloat(instruction)).x;
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, asuint(src), 0, retVal);
+    return asfloat(retVal);
+}
+
+
+/**
+*************************************************************************************************************
+*   AmdDxExtShaderIntrinsics_ReadfirstlaneU
+*
+*   Returns the value of unsigned integer src for the first active lane of the wavefront.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Readfirstlane) returned S_OK.
+*
+*************************************************************************************************************
+*/
+uint AmdDxExtShaderIntrinsics_ReadfirstlaneU(uint src)
+{
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Readfirstlane,
+                                                          0, 0);
+
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, src, 0, retVal);
+    return retVal;
 }
 
 /**
 *************************************************************************************************************
 *   AmdDxExtShaderIntrinsics_Readlane
 *
-*   Returns the value of src for the lane within the wavefront specified by laneId.
+*   Returns the value of float src for the lane within the wavefront specified by laneId.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Readlane) returned S_OK.
 *
 *************************************************************************************************************
 */
-float AmdDxExtShaderIntrinsics_Readlane(float src, uint laneId)
+float AmdDxExtShaderIntrinsics_ReadlaneF(float src, uint laneId)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Readlane, laneId);
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Readlane, 0,
+                                                          laneId);
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(src, 0, 0),
-                                                        asfloat(instruction)).x;
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, asuint(src), 0, retVal);
+    return asfloat(retVal);
+}
+
+/**
+*************************************************************************************************************
+*   AmdDxExtShaderIntrinsics_ReadlaneU
+*
+*   Returns the value of unsigned integer src for the lane within the wavefront specified by laneId.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Readlane) returned S_OK.
+*
+*************************************************************************************************************
+*/
+uint AmdDxExtShaderIntrinsics_ReadlaneU(uint src, uint laneId)
+{
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Readlane, 0,
+                                                          laneId);
+
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, src, 0, retVal);
+    return retVal;
 }
 
 /**
@@ -230,36 +291,62 @@ float AmdDxExtShaderIntrinsics_Readlane(float src, uint laneId)
 *
 *   Returns the current lane id for the thread within the wavefront.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_LaneId) returned S_OK.
+*
 *************************************************************************************************************
 */
 uint AmdDxExtShaderIntrinsics_LaneId()
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_LaneId, 0);
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_LaneId, 0, 0);
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(0, 0, 0),
-                                                        asfloat(instruction)).x;
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, 0, 0, retVal);
+    return retVal;
 }
 
 /**
 *************************************************************************************************************
 *   AmdDxExtShaderIntrinsics_Swizzle
 *
-*   Generic instruction to shuffle the src value among different lanes as specified by the operation.
+*   Generic instruction to shuffle the float src value among different lanes as specified by the
+*   operation.
 *   Note that the operation parameter must be an immediately specified value not a value from a variable.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Swizzle) returned S_OK.
 *
 *************************************************************************************************************
 */
-float AmdDxExtShaderIntrinsics_Swizzle(float src, uint operation)
+float AmdDxExtShaderIntrinsics_SwizzleF(float src, uint operation)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Swizzle,
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Swizzle, 0,
                                                           operation);
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(src, 0, 0),
-                                                        asfloat(instruction)).x;
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, asuint(src), 0, retVal);
+    return asfloat(retVal);
 }
 
+/**
+*************************************************************************************************************
+*   AmdDxExtShaderIntrinsics_SwizzleU
+*
+*   Generic instruction to shuffle the unsigned integer src value among different lanes as specified by the
+*   operation.
+*   Note that the operation parameter must be an immediately specified value not a value from a variable.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Swizzle) returned S_OK.
+*
+*************************************************************************************************************
+*/
+uint AmdDxExtShaderIntrinsics_SwizzleU(uint src, uint operation)
+{
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Swizzle, 0,
+                                                          operation);
+
+    uint retVal;
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, src, 0, retVal);
+    return retVal;
+}
 
 /**
 *************************************************************************************************************
@@ -269,17 +356,25 @@ float AmdDxExtShaderIntrinsics_Swizzle(float src, uint operation)
 *   Inactive or non-existent lanes will always return 0.  The number of existent lanes is the
 *   wavefront size.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Ballot) returned S_OK.
+*
 *************************************************************************************************************
 */
 uint2 AmdDxExtShaderIntrinsics_Ballot(bool predicate)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Ballot, 0);
+    uint instruction;
 
-    float2 result = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                                 float3(predicate, 0, 0),
-                                                                 asfloat(instruction)).xy;
+    uint retVal1;
+    instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Ballot,
+                                                     AmdDxExtShaderIntrinsicsOpcodePhase_0, 0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, predicate, 0, retVal1);
 
-    return uint2(asuint(result.x), asuint(result.y));
+    uint retVal2;
+    instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Ballot,
+                                                     AmdDxExtShaderIntrinsicsOpcodePhase_1, 0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, predicate, 0, retVal2);
+
+    return uint2(retVal1, retVal2);
 }
 
 
@@ -290,17 +385,15 @@ uint2 AmdDxExtShaderIntrinsics_Ballot(bool predicate)
 *   Convenience routine that uses Ballot and returns true if for any of the active lanes the predicate
 *   is true.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Ballot) returned S_OK.
+*
 *************************************************************************************************************
 */
 bool AmdDxExtShaderIntrinsics_BallotAny(bool predicate)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Ballot, 0);
+    uint2 retVal = AmdDxExtShaderIntrinsics_Ballot(predicate);
 
-    float2 result = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                                 float3(predicate, 0, 0),
-                                                                 asfloat(instruction)).xy;
-
-    return ((asuint(result.x) | asuint(result.y)) != 0 ? true : false);
+    return ((retVal.x | retVal.y) != 0 ? true : false);
 }
 
 
@@ -311,21 +404,17 @@ bool AmdDxExtShaderIntrinsics_BallotAny(bool predicate)
 *   Convenience routine that uses Ballot and returns true if for all of the active lanes the predicate
 *   is true.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Ballot) returned S_OK.
+*
 *************************************************************************************************************
 */
 bool AmdDxExtShaderIntrinsics_BallotAll(bool predicate)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Ballot, 0);
+    uint2 ballot = AmdDxExtShaderIntrinsics_Ballot(predicate);
 
-    float2 result = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                                 float3(predicate, 0, 0),
-                                                                 asfloat(instruction)).xy;
+    uint2 execMask = AmdDxExtShaderIntrinsics_Ballot(true);
 
-    float2 execMask = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                                   float3(true, 0, 0),
-                                                                   asfloat(instruction)).xy;
-
-    return (((asuint(result.x) & ~asuint(execMask.x)) | (asuint(result.y) & ~asuint(execMask.y))) == 0 ? true : false);
+    return ((ballot.x == execMask.x) && (ballot.y == execMask.y));
 }
 
 
@@ -336,17 +425,19 @@ bool AmdDxExtShaderIntrinsics_BallotAll(bool predicate)
 *   Returns the masked bit count of the source register for this thread within all the active threads
 *   within a wavefront.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_MBCnt) returned S_OK.
+*
 *************************************************************************************************************
 */
 uint AmdDxExtShaderIntrinsics_MBCnt(uint2 src)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_MBCnt,
-                                                          0);
+    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_MBCnt, 0, 0);
 
-    float mbcnt = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(asfloat(src.x), asfloat(src.y), 0),
-                                                        asfloat(instruction)).x;
-    return asuint(mbcnt);
+    uint retVal;
+
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, src.x, src.y, retVal);
+
+    return retVal;
 }
 
 /**
@@ -355,16 +446,25 @@ uint AmdDxExtShaderIntrinsics_MBCnt(uint2 src)
 *
 *   Returns the minimum value of the three floating point source arguments.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Compare3) returned S_OK.
+*
 *************************************************************************************************************
 */
 float AmdDxExtShaderIntrinsics_Min3F(float src0, float src1, float src2)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Min3F,
-                                                          0);
+    uint minimum;
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(src0, src1, src2),
-                                                        asfloat(instruction)).x;
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Min3F,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, asuint(src0), asuint(src1), minimum);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Min3F,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, asuint(src2), minimum, minimum);
+
+    return asfloat(minimum);
 }
 
 /**
@@ -373,17 +473,25 @@ float AmdDxExtShaderIntrinsics_Min3F(float src0, float src1, float src2)
 *
 *   Returns the minimum value of the three unsigned integer source arguments.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Compare3) returned S_OK.
+*
 *************************************************************************************************************
 */
 uint AmdDxExtShaderIntrinsics_Min3U(uint src0, uint src1, uint src2)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Min3U,
-                                                          0);
+    uint minimum;
 
-    float minimum = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(asfloat(src0), asfloat(src1), asfloat(src2)),
-                                                        asfloat(instruction)).x;
-    return asuint(minimum);
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Min3U,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, src0, src1, minimum);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Min3U,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, src2, minimum, minimum);
+
+    return minimum;
 }
 
 /**
@@ -392,16 +500,25 @@ uint AmdDxExtShaderIntrinsics_Min3U(uint src0, uint src1, uint src2)
 *
 *   Returns the median value of the three floating point source arguments.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Compare3) returned S_OK.
+*
 *************************************************************************************************************
 */
 float AmdDxExtShaderIntrinsics_Med3F(float src0, float src1, float src2)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Med3F,
-                                                          0);
+    uint median;
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(src0, src1, src2),
-                                                        asfloat(instruction)).x;
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Med3F,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, asuint(src0), asuint(src1), median);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Med3F,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, asuint(src2), median, median);
+
+    return asfloat(median);
 }
 
 /**
@@ -410,17 +527,25 @@ float AmdDxExtShaderIntrinsics_Med3F(float src0, float src1, float src2)
 *
 *   Returns the median value of the three unsigned integer source arguments.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Compare3) returned S_OK.
+*
 *************************************************************************************************************
 */
 uint AmdDxExtShaderIntrinsics_Med3U(uint src0, uint src1, uint src2)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Med3U,
-                                                          0);
+    uint median;
 
-    float median = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(asfloat(src0), asfloat(src1), asfloat(src2)),
-                                                        asfloat(instruction)).x;
-    return asuint(median);
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Med3U,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, src0, src1, median);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Med3U,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, src2, median, median);
+
+    return median;
 }
 
 /**
@@ -429,16 +554,25 @@ uint AmdDxExtShaderIntrinsics_Med3U(uint src0, uint src1, uint src2)
 *
 *   Returns the maximum value of the three floating point source arguments.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Compare3) returned S_OK.
+*
 *************************************************************************************************************
 */
 float AmdDxExtShaderIntrinsics_Max3F(float src0, float src1, float src2)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Max3F,
-                                                          0);
+    uint maximum;
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(src0, src1, src2),
-                                                        asfloat(instruction)).x;
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Max3F,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, asuint(src0), asuint(src1), maximum);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Max3F,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, asuint(src2), maximum, maximum);
+
+    return asfloat(maximum);
 }
 
 /**
@@ -447,17 +581,25 @@ float AmdDxExtShaderIntrinsics_Max3F(float src0, float src1, float src2)
 *
 *   Returns the maximum value of the three unsigned integer source arguments.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_Compare3) returned S_OK.
+*
 *************************************************************************************************************
 */
 uint AmdDxExtShaderIntrinsics_Max3U(uint src0, uint src1, uint src2)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Max3U,
-                                                          0);
+    uint maximum;
 
-    float maximum = AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(asfloat(src0), asfloat(src1), asfloat(src2)),
-                                                        asfloat(instruction)).x;
-    return asuint(maximum);
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Max3U,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, src0, src1, maximum);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_Max3U,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           0);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, src2, maximum, maximum);
+
+    return maximum;
 }
 
 /**
@@ -468,18 +610,27 @@ uint AmdDxExtShaderIntrinsics_Max3U(uint src0, uint src1, uint src2)
 *   interpolation mode at the specified pixel location.  Should not be used for "pull-model" interpolation,
 *   PullModelBarycentricCoords should be used instead
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_BaryCoord) returned S_OK.
+*
 *   Can only be used in pixel shader stages.
 *
 *************************************************************************************************************
 */
 float2 AmdDxExtShaderIntrinsics_IjBarycentricCoords(uint interpMode)
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
-                                                          interpMode);
+    uint2 retVal;
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(0, 0, 0),
-                                                        asfloat(instruction)).xy;
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           interpMode);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, 0, 0, retVal.x);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           interpMode);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, retVal.x, 0, retVal.y);
+
+    return float2(asfloat(retVal.x), asfloat(retVal.y));
 }
 
 /**
@@ -489,18 +640,32 @@ float2 AmdDxExtShaderIntrinsics_IjBarycentricCoords(uint interpMode)
 *   Returns the (1/W,1/I,1/J) coordinates at the pixel center which can be used for custom interpolation at
 *   any location in the pixel.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_BaryCoord) returned S_OK.
+*
 *   Can only be used in pixel shader stages.
 *
 *************************************************************************************************************
 */
 float3 AmdDxExtShaderIntrinsics_PullModelBarycentricCoords()
 {
-    uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
-                                                          AmdDxExtShaderIntrinsicsBarycentric_PerspPullModel);
+    uint3 retVal;
 
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(0, 0, 0),
-                                                        asfloat(instruction)).xyz;
+    uint instruction1 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
+                                                           AmdDxExtShaderIntrinsicsBarycentric_PerspPullModel);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction1, 0, 0, retVal.x);
+
+    uint instruction2 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_1,
+                                                           AmdDxExtShaderIntrinsicsBarycentric_PerspPullModel);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction2, retVal.x, 0, retVal.y);
+
+    uint instruction3 = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_BaryCoord,
+                                                           AmdDxExtShaderIntrinsicsOpcodePhase_2,
+                                                           AmdDxExtShaderIntrinsicsBarycentric_PerspPullModel);
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction3, retVal.y, 0, retVal.z);
+
+    return float3(asfloat(retVal.x), asfloat(retVal.y), asfloat(retVal.z));
 }
 
 /**
@@ -510,20 +675,72 @@ float3 AmdDxExtShaderIntrinsics_PullModelBarycentricCoords()
 *   Returns the triangle's parameter information at the specified triangle vertex.
 *   The vertex and parameter indices must specified as immediate values.
 *
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_VtxParam) returned S_OK.
+*
 *   Only available in pixel shader stages.
 *
 *************************************************************************************************************
 */
 float4 AmdDxExtShaderIntrinsics_VertexParameter(uint vertexIdx, uint parameterIdx)
 {
+    uint4 retVal;
+    uint4 instruction;
+
+    instruction.x = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_VtxParam,
+                                 AmdDxExtShaderIntrinsicsOpcodePhase_0,
+      ((vertexIdx << AmdDxExtShaderIntrinsicsBarycentric_VtxShift) |
+       (parameterIdx << AmdDxExtShaderIntrinsicsBarycentric_ParamShift) |
+       (AmdDxExtShaderIntrinsicsBarycentric_ComponentX << AmdDxExtShaderIntrinsicsBarycentric_ComponentShift)));
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction.x, 0, 0, retVal.x);
+
+    instruction.y = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_VtxParam,
+                                 AmdDxExtShaderIntrinsicsOpcodePhase_0,
+      ((vertexIdx << AmdDxExtShaderIntrinsicsBarycentric_VtxShift) |
+       (parameterIdx << AmdDxExtShaderIntrinsicsBarycentric_ParamShift) |
+       (AmdDxExtShaderIntrinsicsBarycentric_ComponentY << AmdDxExtShaderIntrinsicsBarycentric_ComponentShift)));
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction.y, 0, 0, retVal.y);
+
+    instruction.z = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_VtxParam,
+                                 AmdDxExtShaderIntrinsicsOpcodePhase_0,
+      ((vertexIdx << AmdDxExtShaderIntrinsicsBarycentric_VtxShift) |
+       (parameterIdx << AmdDxExtShaderIntrinsicsBarycentric_ParamShift) |
+       (AmdDxExtShaderIntrinsicsBarycentric_ComponentZ << AmdDxExtShaderIntrinsicsBarycentric_ComponentShift)));
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction.z, 0, 0, retVal.z);
+
+    instruction.w = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_VtxParam,
+                                 AmdDxExtShaderIntrinsicsOpcodePhase_0,
+      ((vertexIdx << AmdDxExtShaderIntrinsicsBarycentric_VtxShift) |
+       (parameterIdx << AmdDxExtShaderIntrinsicsBarycentric_ParamShift) |
+       (AmdDxExtShaderIntrinsicsBarycentric_ComponentW << AmdDxExtShaderIntrinsicsBarycentric_ComponentShift)));
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction.w, 0, 0, retVal.w);
+
+    return float4(asfloat(retVal.x), asfloat(retVal.y), asfloat(retVal.z), asfloat(retVal.w));
+}
+
+/**
+*************************************************************************************************************
+*   AmdDxExtShaderIntrinsics_VertexParameterComponent
+*
+*   Returns the triangle's parameter information at the specified triangle vertex and component.
+*   The vertex, parameter and component indices must be specified as immediate values.
+*
+*   Available if CheckSupport(AmdDxExtShaderIntrinsicsSupport_VtxParam) returned S_OK.
+*
+*   Only available in pixel shader stages.
+*
+*************************************************************************************************************
+*/
+float AmdDxExtShaderIntrinsics_VertexParameterComponent(uint vertexIdx, uint parameterIdx, uint componentIdx)
+{
+    uint retVal;
     uint instruction = MakeAmdShaderIntrinsicsInstruction(AmdDxExtShaderIntrinsicsOpcode_VtxParam,
+                           AmdDxExtShaderIntrinsicsOpcodePhase_0,
                            ((vertexIdx << AmdDxExtShaderIntrinsicsBarycentric_VtxShift) |
-                            (parameterIdx << AmdDxExtShaderIntrinsicsBarycentric_ParamShift)));
+                            (parameterIdx << AmdDxExtShaderIntrinsicsBarycentric_ParamShift) |
+                            (componentIdx << AmdDxExtShaderIntrinsicsBarycentric_ComponentShift)));
+    AmdDxExtShaderIntrinsicsUAV.InterlockedCompareExchange(instruction, 0, 0, retVal);
 
-
-    return AmdDxExtShaderIntrinsicsResource.SampleLevel(AmdDxExtShaderIntrinsicsSamplerState,
-                                                        float3(0, 0, 0),
-                                                        asfloat(instruction));
+    return asfloat(retVal);
 }
 
 #endif // AMD_HLSL_EXTENSION
