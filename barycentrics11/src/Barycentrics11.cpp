@@ -82,7 +82,7 @@ void InitExtensions()
     if ( g_AGSGPUInfo.architectureVersion == AGSGPUInfo::ArchitectureVersion_GCN )
     {
         unsigned int extensionsSupported = 0;
-        if ( agsDriverExtensionsDX11_Init( g_AGSContext, DXUTGetD3D11Device(), &extensionsSupported ) == AGS_SUCCESS )
+        if ( agsDriverExtensionsDX11_Init( g_AGSContext, DXUTGetD3D11Device(), 7, &extensionsSupported ) == AGS_SUCCESS )
         {
             if ( extensionsSupported & AGS_DX11_EXTENSION_INTRINSIC_BARYCENTRICS )
             {
@@ -464,9 +464,6 @@ void RenderScene( ID3D11Device* pd3dDevice, ID3D11DeviceContext* pd3dImmediateCo
     pd3dImmediateContext->VSSetConstantBuffers( 0, 1, &g_ConstantBuffer );
     pd3dImmediateContext->PSSetSamplers( 0, 1, &g_SampleLinear );
     pd3dImmediateContext->PSSetShaderResources( 0, 1, &g_TextureSRV );
-
-    // Set a dummy sampler at slot 15 to keep the debug layer happy
-    pd3dImmediateContext->PSSetSamplers( AGS_DX11_SHADER_INSTRINSICS_SAMPLER_SLOT, 1, &g_DummySampler );
 
     pd3dImmediateContext->IASetInputLayout( g_TriangleVertexLayout );
     pd3dImmediateContext->VSSetShader( g_TriangleVS, nullptr, 0 );
