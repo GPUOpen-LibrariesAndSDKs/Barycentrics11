@@ -1,6 +1,8 @@
+[![pipeline status](http://isvgit.amd.com/gpuopen/Barycentrics11/badges/master/pipeline.svg)](http://isvgit.amd.com/gpuopen/Barycentrics11/commits/master)
+
 # AMD Barycentric Shader Extension Sample
 
-This sample shows how to use the GCN shader extensions for D3D11 to access the barycentric intrinsic instruction in an HLSL pixel shader. 
+This sample shows how to use the GCN shader extensions for D3D11 to access the barycentric intrinsic instruction in an HLSL pixel shader.
 
 ### Prerequisites
 * AMD Radeon&trade; GCN-based GPU (HD 7000 series or newer)
@@ -29,7 +31,7 @@ This sample renders a triangle zooming in and out. The triangle uses a checker b
 ### Points of Interest
 * This sample uses a driver extension to enable the use of instrinsic instructions.
   * The driver extension is accessed through the AMD GPU Services (AGS) library.
-  * For more information on AGS, including samples, visit the AGS SDK repository: https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK 
+  * For more information on AGS, including samples, visit the AGS SDK repository: https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK
 * The shader compiler should not use the D3DCOMPILE_SKIP_OPTIMIZATION option, otherwise it will not work.
 * Other instrinsics are also available: Min, Med, Max ...
 
