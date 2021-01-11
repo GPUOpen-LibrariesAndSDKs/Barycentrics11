@@ -16,9 +16,11 @@
 *.txt       eol=crlf
 *.lua       eol=crlf
 *.md        eol=crlf
+*.py        eol=crlf
 *.pdf       binary
 *.ppsx      binary
 *.ico       binary
+*.jpg       binary
 *.png       binary
 *.bmp       binary
 *.dds       binary
